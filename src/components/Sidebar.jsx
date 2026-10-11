@@ -27,6 +27,7 @@ export default function Sidebar({
   counts,
   allTags,
   isOnline,
+  currentUser,
   onOpenSupabaseModal,
   onOpenCaptureModal,
   isOpenMobile,
@@ -152,9 +153,9 @@ export default function Sidebar({
 
         {/* Footer: Sincronización y Cuenta */}
         <div className="sidebar-footer">
-          <div className="sync-badge" title={isOnline ? 'Base de datos sincronizada' : 'Modo local sin conexión'}>
-            <span className={`sync-dot ${isOnline ? '' : 'offline'}`} />
-            <span>{isOnline ? 'Supabase Nube Activa' : 'Almacenamiento Local'}</span>
+          <div className="sync-badge" title={currentUser ? `Conectado como ${currentUser.email}` : (isOnline ? 'Supabase configurado' : 'Almacenamiento Local')}>
+            <span className={`sync-dot ${currentUser ? '' : (isOnline ? '' : 'offline')}`} />
+            <span>{currentUser ? 'Nube Sincronizada' : (isOnline ? 'Supabase Conectado' : 'Almacenamiento Local')}</span>
           </div>
 
           <button 
@@ -162,12 +163,24 @@ export default function Sidebar({
             onClick={onOpenSupabaseModal}
             title="Configurar Supabase y Google Login"
           >
-            <div className="user-avatar">
-              <User size={15} />
+            <div className="user-avatar" style={{ overflow: 'hidden' }}>
+              {currentUser?.user_metadata?.avatar_url ? (
+                <img 
+                  src={currentUser.user_metadata.avatar_url} 
+                  alt="Avatar" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
+              ) : (
+                <User size={15} />
+              )}
             </div>
             <div className="user-info">
-              <div className="user-name">Mi Cuenta Orbia</div>
-              <div className="user-account-type">Google OAuth / Supabase</div>
+              <div className="user-name">
+                {currentUser?.user_metadata?.full_name || currentUser?.email || 'Mi Cuenta Orbia'}
+              </div>
+              <div className="user-account-type">
+                {currentUser ? 'Google OAuth Conectado' : 'Google OAuth / Supabase'}
+              </div>
             </div>
             <Settings size={15} color="var(--color-slate)" />
           </button>
